@@ -1,8 +1,10 @@
 const express = require("express");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
+const chromium = require("@sparticuz/chromium");
 const cors = require("cors");
 require("dotenv").config();
+
 const app = express();
 app.use(cors());
 
@@ -12,18 +14,27 @@ app.get("/data", async (req, res) => {
     const dateFilter = req.query.date || today;
 
     const browser = await puppeteer.launch({
-      headless: "new",
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--single-process",
-        "--no-zygote",
-      ],
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPEPTEER_EXECUTTABLE_PATH
-          : puppeteer.executablePath(),
+    //   args: chromium.args,
+    //   defaultViewport: chromium.defaultViewport,
+    //   executablePath: await chromium.executablePath(),
+    //   headless: chromium.headless,
+    //   ignoreHTTPSErrors: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
+
+    // const browser = await puppeteer.launch({
+    //   headless: "new",
+    //   args: [
+    //     "--no-sandbox",
+    //     "--disable-setuid-sandbox",
+    //     "--single-process",
+    //     "--no-zygote",
+    //   ],
+    //   executablePath:
+    //     process.env.NODE_ENV === "production"
+    //       ? process.env.PUPEPTEER_EXECUTTABLE_PATH
+    //       : puppeteer.executablePath(),
+    // });
 
     const page = await browser.newPage();
 
