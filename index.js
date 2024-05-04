@@ -42,16 +42,12 @@ app.get("/data", async (req, res) => {
     // });
 
     const page = await browsers.newPage();
-    // Set user agent
-    await page.setUserAgent(
-      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
-    );
-    // Set user agent if necessary
+    await page.setUserAgent("Your User Agent String"); // Set user agent if necessary
 
     await page.goto(
       "https://www.nbc.gov.kh/english/economic_research/exchange_rate.php"
     );
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(2000);
 
     await page.$eval(
       "#datepicker",
@@ -61,7 +57,7 @@ app.get("/data", async (req, res) => {
       dateFilter
     );
     await page.click('input[name="view"]');
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(2000);
 
     const content = await page.content();
     const $ = cheerio.load(content);
@@ -114,4 +110,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
