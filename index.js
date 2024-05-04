@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
@@ -9,26 +7,55 @@ require("dotenv").config();
 const app = express();
 app.use(cors());
 
+const CHROMIUM_PATH =
+  "https://vomrghiulbmrfvmhlflk.supabase.co/storage/v1/object/public/chromium-pack/chromium-v123.0.0-pack.tar";
+async function getBrowser() {
+  if (process.env.NODE_ENV === "production") {
+    const chromium = require("@sparticuz/chromium-min");
+    const puppeteerCore = require("puppeteer-core");
+
+    const executablePath = await chromium.executablePath(CHROMIUM_PATH);
+
+    const browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath,
+      headless: chromium.headless,
+    });
+    return browser;
+  } else {
+    const browser = await puppeteer.launch();
+    return browser;
+  }
+}
+
 app.get("/data", async (req, res) => {
   try {
     const today = new Date().toISOString().split("T")[0];
     const dateFilter = req.query.date || today;
 
-    const browser = await puppeteer.launch({
-      headless: "new", // Opt in to the new headless mode
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      executablePath: await chromium.executablePath(), // If you are using a specific version of Chromium
-    });
+    const browser = await getBrowser();
+    // puppeteer.launch({
+    //   headless: "new", // Opt in to the new headless mode
+    //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    //   executablePath: await chromium.executablePath(), // If you are using a specific version of Chromium
+    // });
 
     const page = await browser.newPage();
     await page.setUserAgent("Your User Agent String"); // Set user agent if necessary
 
-    await page.goto("https://www.nbc.gov.kh/english/economic_research/exchange_rate.php");
+    await page.goto(
+      "https://www.nbc.gov.kh/english/economic_research/exchange_rate.php"
+    );
     await page.waitForTimeout(2000);
 
-    await page.$eval("#datepicker", (datepicker, dateFilter) => {
-      datepicker.value = dateFilter;
-    }, dateFilter);
+    await page.$eval(
+      "#datepicker",
+      (datepicker, dateFilter) => {
+        datepicker.value = dateFilter;
+      },
+      dateFilter
+    );
     await page.click('input[name="view"]');
     await page.waitForTimeout(2000);
 
@@ -52,7 +79,9 @@ app.get("/data", async (req, res) => {
     const officialExchangeRateRow = $('td:contains("Official Exchange Rate")');
     const officialExchangeRateText = officialExchangeRateRow.text();
     const officialExchangeRateMatch = officialExchangeRateText.match(/(\d+)/);
-    const officialExchangeRate = officialExchangeRateMatch ? parseInt(officialExchangeRateMatch[1]) : null;
+    const officialExchangeRate = officialExchangeRateMatch
+      ? parseInt(officialExchangeRateMatch[1])
+      : null;
 
     await browser.close();
 
