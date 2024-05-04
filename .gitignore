@@ -1,4 +1,10 @@
-node_modules
+
 .env
-.env.*
-.vercel
+# Ignore node_modules directory
+node_modules/
+
+# Ignore .env files
+.env*
+
+# Ignore .vercel directory
+.vercel/
