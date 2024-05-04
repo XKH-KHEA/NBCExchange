@@ -45,7 +45,8 @@ app.get("/data", async (req, res) => {
     await page.setUserAgent("Your User Agent String"); // Set user agent if necessary
 
     await page.goto(
-      "https://www.nbc.gov.kh/english/economic_research/exchange_rate.php"
+      "https://www.nbc.gov.kh/english/economic_research/exchange_rate.php",
+      { waitUntil: "domcontentloaded", timeout: 60000 }
     );
     await page.waitForTimeout(2000);
 
