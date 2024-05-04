@@ -34,20 +34,24 @@ app.get("/data", async (req, res) => {
     const today = new Date().toISOString().split("T")[0];
     const dateFilter = req.query.date || today;
 
-    const browser = await getBrowser();
+    const browsers = await getBrowser();
     // puppeteer.launch({
     //   headless: "new", // Opt in to the new headless mode
     //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
     //   executablePath: await chromium.executablePath(), // If you are using a specific version of Chromium
     // });
 
-    const page = await browser.newPage();
-    await page.setUserAgent("Your User Agent String"); // Set user agent if necessary
+    const page = await browsers.newPage();
+    // Set user agent
+    await page.setUserAgent(
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
+    );
+    // Set user agent if necessary
 
     await page.goto(
       "https://www.nbc.gov.kh/english/economic_research/exchange_rate.php"
     );
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(5000);
 
     await page.$eval(
       "#datepicker",
@@ -57,7 +61,7 @@ app.get("/data", async (req, res) => {
       dateFilter
     );
     await page.click('input[name="view"]');
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(5000);
 
     const content = await page.content();
     const $ = cheerio.load(content);
@@ -83,7 +87,7 @@ app.get("/data", async (req, res) => {
       ? parseInt(officialExchangeRateMatch[1])
       : null;
 
-    await browser.close();
+    await browsers.close();
 
     const response = {
       ok: true,
