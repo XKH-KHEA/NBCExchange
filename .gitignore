@@ -8,3 +8,4 @@ node_modules/
 
 # Ignore .vercel directory
 .vercel/
+file.txt
