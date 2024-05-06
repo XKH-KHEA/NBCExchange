@@ -8,8 +8,8 @@
   ],
 
   "functions": {
-    "/*.js": {
-      "maxDuration": 600
+    "index.js": {
+      "maxDuration": 6000
     }
   },
 
